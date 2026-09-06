@@ -2,6 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 from pathlib import Path
+import pingouin as pg
 
 # ============================================================
 # 0. Configuración de rutas (basadas en la ubicación del script)
@@ -146,7 +147,7 @@ for nombre_periodo, (inicio, fin) in periodos.items():
         media = subset[est].mean()
         varianza = subset[est].var()
         print(f"{est}: media = {media:.3f}, varianza = {varianza:.4f}")
-        
+
 resultados_varianza = []
 
 for nombre_periodo, (inicio, fin) in periodos.items():
@@ -162,3 +163,62 @@ for nombre_periodo, (inicio, fin) in periodos.items():
 tabla_varianzas = pd.DataFrame(resultados_varianza)
 tabla_varianzas.to_csv(carpeta_resultados / "tabla_varianzas_estaciones.csv", index=False)
 print(tabla_varianzas)
+
+# ============================================================
+# 10. Cargar datos de CO2 (Mauna Loa)
+# ============================================================
+df_co2 = pd.read_excel(
+    carpeta_raw / "co2_mauna_loa.xlsx",
+    sheet_name="Sheet1",
+    header=0,
+    na_values=[-99.99]
+)
+
+df_co2['fecha'] = pd.to_datetime(
+    df_co2['Year'].astype(str) + '-' + df_co2['Month'].astype(str),
+    format='%Y-%m'
+)
+
+# ============================================================
+# 11. Gráfico de CO2 en el tiempo (interpolated y trend)
+# ============================================================
+plt.figure(figsize=(10, 5))
+plt.plot(df_co2['fecha'], df_co2['Interpolated'], color='#1C62C7', linewidth=1, label='Interpolated')
+plt.plot(df_co2['fecha'], df_co2['Trend'], color='#B30909', linewidth=1.5, label='Trend')
+plt.title('Concentración de CO₂ en Mauna Loa (1958-actualidad)')
+plt.xlabel('Año')
+plt.ylabel('CO₂ (ppm)')
+plt.legend()
+plt.grid(True, linestyle='--', alpha=0.5)
+plt.savefig(carpeta_resultados / "grafico_co2.png", dpi=300, bbox_inches='tight')
+plt.show()
+
+# ============================================================
+# 12. Unir CO2 con anomalías de temperatura (elige un mes, ej. enero)
+# ============================================================
+co2_enero = df_co2[df_co2['Month'] == 1][['Year', 'Trend']].rename(columns={'Trend': 'CO2_trend'})
+
+df_union = pd.merge(df[['Year', 'Jan']], co2_enero, on='Year', how='inner')
+df_union = df_union.dropna()
+
+print(df_union.head())
+print("Filas después de unir:", len(df_union))
+
+# ============================================================
+# 13. Diagrama de dispersión: CO2 vs anomalía de temperatura
+# ============================================================
+plt.figure(figsize=(8, 6))
+plt.scatter(df_union['Jan'], df_union['CO2_trend'], color='#5A1594', alpha=0.7)
+plt.title('Relación entre CO₂ y anomalía de temperatura (Enero)')
+plt.xlabel('Anomalía de temperatura (°C)')
+plt.ylabel('CO₂ (ppm, tendencia)')
+plt.grid(True, linestyle='--', alpha=0.5)
+plt.savefig(carpeta_resultados / "grafico_dispersion_co2_temp.png", dpi=300, bbox_inches='tight')
+plt.show() 
+
+# ============================================================
+# 14. Correlación de Pearson entre CO2 y temperatura
+# ============================================================
+
+resultado_pearson = pg.corr(df_union['Jan'], df_union['CO2_trend'])
+print(resultado_pearson)
