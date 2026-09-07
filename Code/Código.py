@@ -4,17 +4,12 @@ import numpy as np
 from pathlib import Path
 import pingouin as pg
 
-# ============================================================
-# 0. Configuración de rutas (basadas en la ubicación del script)
-# ============================================================
 carpeta_script = Path(__file__).resolve().parent   # carpeta donde está este .py (code/)
 carpeta_raw = carpeta_script.parent / "RawData"
 carpeta_resultados = carpeta_script.parent / "results"
 carpeta_resultados.mkdir(parents=True, exist_ok=True)
 
-# ============================================================
 # 1. Cargar y limpiar los datos
-# ============================================================
 df = pd.read_csv(
     carpeta_raw / "Northern_Hemisphere_means.csv",
     skiprows=1,
@@ -29,9 +24,7 @@ df = df.dropna(subset=['Year'])
 
 print("Rango de años en los datos:", df['Year'].min(), "-", df['Year'].max())
 
-# ============================================================
 # 2. GRÁFICO 1: Un mes específico (Enero)
-# ============================================================
 plt.figure(figsize=(10, 5))
 plt.plot(df['Year'], df['Jan'], color='#1C62C7', linewidth=1.5, label='Enero (Jan)')
 plt.axhline(y=0, color='#B30909', linestyle='-', linewidth=1.5, label='Promedio de 1951 a 1980')
@@ -43,9 +36,7 @@ plt.grid(True, linestyle='--', alpha=0.7)
 plt.savefig(carpeta_resultados / "grafico_enero.png", dpi=300, bbox_inches='tight')
 plt.show()
 
-# ============================================================
 # 3. GRÁFICO 2: Promedios de cada estación
-# ============================================================
 plt.figure(figsize=(10, 5))
 plt.plot(df['Year'], df['DJF'], color='#0D82FF', label='Invierno (DJF)', linewidth=1.5)
 plt.plot(df['Year'], df['MAM'], color='#12960B', label='Primavera (MAM)', linewidth=1.5)
@@ -60,9 +51,7 @@ plt.grid(True, linestyle='--', alpha=0.7)
 plt.savefig(carpeta_resultados / "grafico_estaciones.png", dpi=300, bbox_inches='tight')
 plt.show()
 
-# ============================================================
 # 4. GRÁFICO 3: Promedio de anomalías anuales (J-D)
-# ============================================================
 plt.figure(figsize=(10, 5))
 plt.plot(df['Year'], df['J-D'], color='#5A1594', linewidth=1.5, label='Anual (J-D)')
 plt.axhline(y=0, color='#B30909', linestyle='-', linewidth=1.5, label='Promedio de 1951 a 1980')
@@ -74,9 +63,7 @@ plt.grid(True, linestyle='--', alpha=0.7)
 plt.savefig(carpeta_resultados / "grafico_anual.png", dpi=300, bbox_inches='tight')
 plt.show()
 
-# ============================================================
 # 5. Tablas de frecuencia por periodo (Parte 1.2)
-# ============================================================
 periodo_1951_1980 = df[(df['Year'] >= 1951) & (df['Year'] <= 1980)]['J-D']
 periodo_1981_2010 = df[(df['Year'] >= 1981) & (df['Year'] <= 2010)]['J-D']
 
@@ -95,9 +82,7 @@ print(tabla_1981_2010)
 tabla_1951_1980.to_csv(carpeta_resultados / "tabla_frecuencias_1951_1980.csv")
 tabla_1981_2010.to_csv(carpeta_resultados / "tabla_frecuencias_1981_2010.csv")
 
-# ============================================================
 # 6. Histograma comparando ambos periodos
-# ============================================================
 plt.figure(figsize=(10, 5))
 plt.hist(periodo_1951_1980, bins=bins, alpha=0.6, label='1951-1980', color='#1C62C7')
 plt.hist(periodo_1981_2010, bins=bins, alpha=0.6, label='1981-2010', color='#B30909')
@@ -110,18 +95,15 @@ plt.grid(True, linestyle='--', alpha=0.5)
 plt.savefig(carpeta_resultados / "histograma_periodos.png", dpi=300, bbox_inches='tight')
 plt.show()
 
-# ============================================================
 # 7. Deciles 3 y 7 del periodo de referencia (1951-1980)
-# ============================================================
 decil_3 = np.quantile(periodo_1951_1980.dropna(), 0.3)
 decil_7 = np.quantile(periodo_1951_1980.dropna(), 0.7)
 
 print(f"Decil 3 (límite de 'frío'): {decil_3:.3f}")
 print(f"Decil 7 (límite de 'caliente'): {decil_7:.3f}")
 
-# ============================================================
+
 # 8. % de anomalías "calientes" en 1981-2010
-# ============================================================
 calientes_1981_2010 = (periodo_1981_2010 > decil_7).sum()
 total_1981_2010 = periodo_1981_2010.dropna().shape[0]
 porcentaje_calientes = (calientes_1981_2010 / total_1981_2010) * 100
@@ -129,9 +111,7 @@ porcentaje_calientes = (calientes_1981_2010 / total_1981_2010) * 100
 print(f"Anomalías 'calientes' en 1981-2010: {calientes_1981_2010} de {total_1981_2010}")
 print(f"Porcentaje: {porcentaje_calientes:.1f}%")
 
-# ==============================================================
 # 9. Medias y varianzas por estación
-# ==============================================================
 periodos = {
     "1921-1950": (1921, 1950),
     "1951-1980": (1951, 1980),
@@ -164,9 +144,7 @@ tabla_varianzas = pd.DataFrame(resultados_varianza)
 tabla_varianzas.to_csv(carpeta_resultados / "tabla_varianzas_estaciones.csv", index=False)
 print(tabla_varianzas)
 
-# ============================================================
 # 10. Cargar datos de CO2 (Mauna Loa)
-# ============================================================
 df_co2 = pd.read_excel(
     carpeta_raw / "co2_mauna_loa.xlsx",
     sheet_name="Sheet1",
@@ -179,9 +157,7 @@ df_co2['fecha'] = pd.to_datetime(
     format='%Y-%m'
 )
 
-# ============================================================
 # 11. Gráfico de CO2 en el tiempo (interpolated y trend)
-# ============================================================
 plt.figure(figsize=(10, 5))
 plt.plot(df_co2['fecha'], df_co2['Interpolated'], color='#1C62C7', linewidth=1, label='Interpolated')
 plt.plot(df_co2['fecha'], df_co2['Trend'], color='#B30909', linewidth=1.5, label='Trend')
@@ -193,9 +169,7 @@ plt.grid(True, linestyle='--', alpha=0.5)
 plt.savefig(carpeta_resultados / "grafico_co2.png", dpi=300, bbox_inches='tight')
 plt.show()
 
-# ============================================================
 # 12. Unir CO2 con anomalías de temperatura (elige un mes, ej. enero)
-# ============================================================
 co2_enero = df_co2[df_co2['Month'] == 1][['Year', 'Trend']].rename(columns={'Trend': 'CO2_trend'})
 
 df_union = pd.merge(df[['Year', 'Jan']], co2_enero, on='Year', how='inner')
@@ -204,9 +178,7 @@ df_union = df_union.dropna()
 print(df_union.head())
 print("Filas después de unir:", len(df_union))
 
-# ============================================================
 # 13. Diagrama de dispersión: CO2 vs anomalía de temperatura
-# ============================================================
 plt.figure(figsize=(8, 6))
 plt.scatter(df_union['Jan'], df_union['CO2_trend'], color='#5A1594', alpha=0.7)
 plt.title('Relación entre CO₂ y anomalía de temperatura (Enero)')
@@ -216,9 +188,6 @@ plt.grid(True, linestyle='--', alpha=0.5)
 plt.savefig(carpeta_resultados / "grafico_dispersion_co2_temp.png", dpi=300, bbox_inches='tight')
 plt.show() 
 
-# ============================================================
 # 14. Correlación de Pearson entre CO2 y temperatura
-# ============================================================
-
 resultado_pearson = pg.corr(df_union['Jan'], df_union['CO2_trend'])
 print(resultado_pearson)
