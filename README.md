@@ -1,6 +1,6 @@
 # Taller-5.-Doing-Economics-Measuring-Climate-Change
 INTEGRANTES:
-- LÍDER DEL PROYECTO Y ENLACE CON LA ENTIDAD: Samuel 
+- LÍDER DEL PROYECTO Y ENLACE CON LA ENTIDAD: Samuel (Según mi rol como líder del equipo consultor, me encargué de coordinar el análisis integral del taller y de liderar la construcción del material final de presentación, asegurando que la evidencia analizada respondiera de forma clara y ordenada a las tres preguntas.)
 - Especialista en datos y reproducibilidad: Mariana (Según mi rol como especialista de datos y reproductividad, me encargue en la realización del código, la sección 1.2, en la que me asegure de que fuera reproducible y la creación de gráficas para la realización correcta de los puntos propuestos.) y Danna (Al especializarme en datos y reproducibilidad del código, me enfoqué en responder de manera analítica el apartado 1.2, infiriendo lo que nos decían las gráficas sobre los fenómenos climáticos a presentar.)
 - Analista Cuantitativo: Valery
 - Especialista en visualización y comunicación: Ariana (Como especialista en visualización y comunicación de datos, me encargué del diseño y elaboración de las gráficas de línea y dispersión, principalmente para el análisis de la Sección 1.3. También realicé el procesamiento, cálculo e interpretación de los datos, con el objetivo de representar visualmente las relaciones y tendencias encontradas y facilitar su análisis dentro del equipo.)
